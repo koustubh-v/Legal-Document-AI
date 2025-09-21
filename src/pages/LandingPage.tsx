@@ -666,28 +666,120 @@ const LandingPage = () => {
       </div>
 
       <header className="hero">
-        <div className="container">
-          <h1 className="headline" aria-hidden>
-            <span className="line-1">Simplify Complex</span>
-            <span className="line-2">Legal Documents</span>
-            <span className="line-3">With <span style={{ position: "relative", display: "inline-block" }}>AI
-              <svg className="ai-underline" viewBox="0 0 200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                <path d="M5 28 C40 5, 120 35, 195 20" fill="none" stroke="#ffd37b" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" opacity="0.95"/>
-                <path d="M5 30 C40 10, 120 37, 195 22" fill="none" stroke="#f8fafc" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.18"/>
-              </svg>
-            </span></span>
-          </h1>
+  <style>{`
+    /* --- Keep desktop untouched --- */
 
-          <p className="sub">AI that helps you analyze, summarize, and reason with your legal PDFs — fast, private, and reliable.</p>
+    .ai-text {
+      position: relative;
+      display: inline-block;
+      white-space: nowrap;
+      line-height: 1;
+      padding-bottom: 0.08em;
+    }
 
-          <div style={{ marginTop: 24 }}>
-            <button className="liquid-btn" onClick={() => navigate("/chat")} aria-label="Try Now">
-              <span style={{ position: "relative", zIndex: 10, display: "inline-flex", alignItems: "center", gap: 8 }}>Try Now <ArrowRight /></span>
-              <span className="liquid-shine" />
-            </button>
-          </div>
-        </div>
-      </header>
+    .ai-text .ai-underline {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -0.22em;
+      height: 0.45em;
+      pointer-events: none;
+      display: block;
+      --ai-underline-width: 1.4em;
+      width: var(--ai-underline-width);
+    }
+
+    @media (max-width: 380px) {
+      .ai-text .ai-underline {
+        --ai-underline-width: 1.2em;
+        bottom: -0.26em;
+        height: 0.5em;
+      }
+    }
+
+    /* --- Mobile font & spacing adjustments --- */
+    @media (max-width: 768px) {
+      .headline .line-1 {
+        font-size: 1.6rem !important;
+      }
+      .headline .line-2 {
+        font-size: 2.6rem !important;
+        font-weight: 700 !important;
+      }
+      .headline .line-3 {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+      }
+
+      .ai-text .ai-underline {
+        --ai-underline-width: 1.3em;
+      }
+
+      .sub {
+        font-size: 1rem !important;
+      }
+
+      /* 🔥 Add padding so it doesn’t overlap with navbar */
+      .hero {
+        padding-top: 80px;
+        padding-bottom: 36px;
+      }
+    }
+  `}</style>
+
+  <div className="container">
+    <h1 className="headline" aria-hidden>
+      <span className="line-1">Simplify Complex</span>
+      <span className="line-2">Legal Documents</span>
+      <span className="line-3">
+        With{" "}
+        <span className="ai-text" style={{ position: "relative", display: "inline-block" }}>
+          AI
+          <svg
+            className="ai-underline"
+            viewBox="0 0 200 40"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <path
+              d="M5 28 C40 5, 120 35, 195 20"
+              fill="none"
+              stroke="#ffd37b"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.95"
+            />
+            <path
+              d="M5 30 C40 10, 120 37, 195 22"
+              fill="none"
+              stroke="#f8fafc"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.18"
+            />
+          </svg>
+        </span>
+      </span>
+    </h1>
+
+    <p className="sub">
+      AI that helps you analyze, summarize, and reason with your legal PDFs — fast, private, and reliable.
+    </p>
+
+    <div style={{ marginTop: 24 }}>
+      <button className="liquid-btn" onClick={() => navigate("/chat")} aria-label="Try Now">
+        <span style={{ position: "relative", zIndex: 10, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          Try Now <ArrowRight />
+        </span>
+        <span className="liquid-shine" />
+      </button>
+    </div>
+  </div>
+</header>
+
 
       <main className="sections">
         {features.map((feature, i) => (
