@@ -100,7 +100,7 @@ export const InsightsPanel = ({
 
   return (
     <div
-      className="flex flex-col h-full text-gray-100 border-l md:w-80 lg:w-80 w-full"
+      className="flex flex-col h-full text-gray-100 border-l md:w-80 lg:w-80 w-full mt-16 md:mt-0"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",

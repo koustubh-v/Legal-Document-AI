@@ -42,7 +42,7 @@ export const SourcesPanel = ({
 }: SourcesPanelProps) => {
   return (
     <div
-      className="flex flex-col h-full text-gray-100 border-r md:w-80 lg:w-96 w-full"
+      className="flex flex-col h-full text-gray-100 border-r md:w-80 lg:w-96 w-full mt-16 md:mt-0"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",

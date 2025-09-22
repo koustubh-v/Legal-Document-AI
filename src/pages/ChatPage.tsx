@@ -24,13 +24,15 @@ const ChatPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSourcesDesktop, setShowSourcesDesktop] = useState(true);
   const [showInsightsDesktop, setShowInsightsDesktop] = useState(true);
+  const [showSourcesMobile, setShowSourcesMobile] = useState(false);
+  const [showInsightsMobile, setShowInsightsMobile] = useState(false);
 
   const { toast } = useToast();
   const { data: filesData, isLoading, error, refetch } = useFiles();
   const uploadMutation = useUploadFile();
 
   const uploadedFiles: UploadedFile[] =
-    filesData?.files?.map((file) => ({
+    filesData?.files?.map((file: any) => ({
       id: file.file_id,
       name: file.filename,
       size: file.file_size,
@@ -54,18 +56,6 @@ const ChatPage = () => {
     }
   }, [error, toast]);
 
-  const handleFilesUploaded = async (files: File[]) => {
-    try {
-      for (const file of files) {
-        await uploadMutation.mutateAsync(file);
-      }
-      await refetch();
-      setShowUploadModal(false);
-    } catch (error) {
-      console.error("Upload failed:", error);
-    }
-  };
-
   useEffect(() => {
     if (selectedFiles.length === 0 && uploadedFiles.length > 0) {
       const firstFile = uploadedFiles[0];
@@ -74,6 +64,18 @@ const ChatPage = () => {
       setActiveFileId(firstFile.id);
     }
   }, [uploadedFiles, selectedFiles.length]);
+
+  const handleFilesUploaded = async (files: File[]) => {
+    try {
+      for (const file of files) {
+        await uploadMutation.mutateAsync(file);
+      }
+      await refetch();
+      setShowUploadModal(false);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
 
   const handleFileSelect = (fileId: string, selected: boolean) => {
     if (selected) {
@@ -107,72 +109,48 @@ const ChatPage = () => {
   }
 
   return (
-    <div
-      className="font-poppins bg-background flex flex-col"
-      style={{ height: "100vh", overflow: "hidden" }}
-    >
+    <div className="font-poppins bg-background flex flex-col h-screen">
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
           .font-poppins { font-family: 'Poppins', sans-serif; }
+          .mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 40; }
+          .mobile-panel { position: fixed; top: 0; bottom: 0; width: 80%; max-width: 360px; z-index: 50; transition: transform 0.28s ease-in-out; display:flex; flex-direction:column; }
+          .mobile-panel.sources { left: 0; transform: translateX(-100%); }
+          .mobile-panel.sources.open { transform: translateX(0); }
+          .mobile-panel.insights { right: 0; transform: translateX(100%); }
+          .mobile-panel.insights.open { transform: translateX(0); }
+          @media (min-width: 900px) { .mobile-only { display:none; } }
+          @media (max-width: 899px) { .desktop-only { display:none; } }
         `}
       </style>
 
-      {/* Mobile Nav */}
-      <header className="fixed top-0 left-0 w-full z-20 bg-background py-4 px-6 flex justify-between items-center md:hidden border-b border-gray-800">
+      <header className="fixed top-0 left-0 w-full z-30 bg-background py-4 px-6 flex justify-between items-center md:hidden border-b border-gray-800">
         <a href="/" className="text-xl font-bold text-foreground z-30">Legal AI</a>
-        <button
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          className="z-30"
-        >
+        <button onClick={() => setIsMobileMenuOpen((prev) => !prev)} className="z-30">
           {isMobileMenuOpen ? (
-            <svg
-              className="w-6 h-6 text-foreground"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
+            <svg className="w-6 h-6 text-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           ) : (
-            <svg
-              className="w-6 h-6 text-foreground"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              ></path>
+            <svg className="w-6 h-6 text-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
           )}
         </button>
       </header>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-10 bg-background p-6 pt-8">
+        <div className="md:hidden fixed inset-0 top-16 z-20 bg-background p-6 pt-8">
           <nav className="flex flex-col items-start space-y-4">
-            <a href="#" className="text-lg text-muted-foreground hover:text-foreground transition-colors">Overview</a>
-            <a href="#" className="text-lg text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#" className="text-lg text-muted-foreground hover:text-foreground transition-colors">Contact</a>
+            <a href="#" onClick={(e) => e.preventDefault()} className="text-lg text-muted-foreground hover:text-foreground transition-colors">Overview</a>
+            <a href="#" onClick={(e) => e.preventDefault()} className="text-lg text-muted-foreground hover:text-foreground transition-colors">Features</a>
+            <a href="#" onClick={(e) => e.preventDefault()} className="text-lg text-muted-foreground hover:text-foreground transition-colors">Contact</a>
           </nav>
         </div>
       )}
 
-      {/* Main Content */}
-      <main
-        className="flex-1 flex flex-row pt-16 md:pt-0"
-        style={{ overflow: "hidden" }}
-      >
-        {/* Sources */}
+      <main className="flex-1 flex flex-row" style={{ overflow: "hidden" }}>
         <div
           className={`${mobileView === "sources" ? "block w-full h-full" : "hidden"} md:block md:h-full`}
           style={{
@@ -194,14 +172,9 @@ const ChatPage = () => {
           )}
         </div>
 
-        {/* Chat */}
         <div
           className={`${mobileView === "chat" ? "flex" : "hidden"} flex-1 flex-col`}
-          style={{
-            minHeight: 0,
-            overflow: "hidden",
-            transition: "width 200ms ease",
-          }}
+          style={{ minHeight: 0, overflow: "hidden", transition: "width 200ms ease" }}
         >
           <ChatSection
             activeDocument={activeDocument}
@@ -215,7 +188,6 @@ const ChatPage = () => {
           />
         </div>
 
-        {/* Insights */}
         <div
           className={`${mobileView === "insights" ? "block w-full h-full" : "hidden"} md:hidden lg:block lg:h-full`}
           style={{
@@ -237,41 +209,68 @@ const ChatPage = () => {
         </div>
       </main>
 
-      {/* Mobile Tabs */}
-      <div className="md:hidden flex justify-around p-2 border-t bg-background shadow-sm">
+      <div className="md:hidden flex justify-around p-2 border-t bg-background shadow-sm mobile-only" style={{ position: "relative", zIndex: 10 }}>
         <button
-          onClick={() => setMobileView("sources")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${
-            mobileView === "sources"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground"
-          }`}
+          onClick={() => {
+            setMobileView("sources");
+            setShowSourcesMobile(false);
+            setShowInsightsMobile(false);
+          }}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "sources" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
         >
           Sources
         </button>
         <button
-          onClick={() => setMobileView("chat")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${
-            mobileView === "chat"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground"
-          }`}
+          onClick={() => {
+            setMobileView("chat");
+            setShowSourcesMobile(false);
+            setShowInsightsMobile(false);
+          }}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "chat" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
         >
           Chat
         </button>
         <button
-          onClick={() => setMobileView("insights")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${
-            mobileView === "insights"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground"
-          }`}
+          onClick={() => {
+            setMobileView("insights");
+            setShowSourcesMobile(false);
+            setShowInsightsMobile(false);
+          }}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "insights" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
         >
           Insights
         </button>
       </div>
 
-      {/* Upload Modal */}
+      {showSourcesMobile && (
+        <>
+          <div className="mobile-overlay" onClick={() => setShowSourcesMobile(false)} />
+          <div className="mobile-panel sources open">
+            <SourcesPanel
+              uploadedFiles={uploadedFiles}
+              selectedFiles={selectedFiles}
+              onFileSelect={handleFileSelect}
+              onFileClick={handleFileClick}
+              onAddMore={() => setShowUploadModal(true)}
+            />
+          </div>
+        </>
+      )}
+
+      {showInsightsMobile && (
+        <>
+          <div className="mobile-overlay" onClick={() => setShowInsightsMobile(false)} />
+          <div className="mobile-panel insights open">
+            <InsightsPanel
+              activeDocument={activeDocument}
+              hasDocuments={uploadedFiles.length > 0}
+              activeFileId={activeFileId}
+              conversationId={conversationId}
+            />
+          </div>
+        </>
+      )}
+
       <UploadModal
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
