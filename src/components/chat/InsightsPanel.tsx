@@ -24,7 +24,6 @@ type InsightWire = {
   summary?: { available?: boolean; url?: string; created_at?: string; word_count?: number };
   audio?: { available?: boolean; url?: string; created_at?: string; duration?: string };
   report?: { available?: boolean; url?: string; created_at?: string; page_count?: number };
-  // Flat fallbacks some backends return:
   summary_available?: boolean;
   summary_url?: string;
   audio_available?: boolean;
@@ -42,19 +41,15 @@ export const InsightsPanel = ({
 }: InsightsPanelProps) => {
   const [userNotes, setUserNotes] = useState("");
 
-  // Actions
   const generateSummaryMutation = useGenerateSummary();
   const generateAudioMutation = useGenerateAudio();
   const generateReportMutation = useGenerateReport();
   const exportConversationMutation = useExportConversation();
 
-  // Data
   const { data: insightsResp, refetch: refetchInsights } = useInsights(activeFileId ?? null);
 
-  // Download helper (resolves backend base URL & triggers download)
   const downloadFile = useDownloadFile();
 
-  // Normalize insights object (works for both nested and flat formats)
   const insights = (insightsResp?.insights || insightsResp || {}) as InsightWire;
 
   const summaryAvailable = useMemo(
@@ -105,7 +100,7 @@ export const InsightsPanel = ({
 
   return (
     <div
-      className="w-80 flex flex-col h-full text-gray-100 border-l"
+      className="flex flex-col h-full text-gray-100 border-l md:w-80 lg:w-80 w-full"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",
@@ -119,59 +114,59 @@ export const InsightsPanel = ({
           transition: all 0.25s ease;
         }
         .ins-card:hover { transform: translateY(-4px); }
-
+        .dark-scrollbar::-webkit-scrollbar { width: 8px; }
+        .dark-scrollbar::-webkit-scrollbar-track { background: #050505; }
+        .dark-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg,#2b2b2b,#141414);
+          border-radius: 999px;
+          border: 2px solid rgba(0,0,0,0.6);
+        }
         .accent-green { color: #34d399; }
         .accent-purple { color: #818cf8; }
         .accent-red { color: #f87171; }
         .accent-amber { color: #fbbf24; }
-
         .btn-green {
           background: rgba(52,211,153,0.12);
           border: 1px solid rgba(52,211,153,0.25);
           color: #34d399;
         }
         .btn-green:hover { background: rgba(52,211,153,0.18); }
-        .btn-green:disabled {
-          opacity: 0.5; cursor: not-allowed; background: rgba(52,211,153,0.06);
-        }
-
+        .btn-green:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(52,211,153,0.06); }
         .btn-purple {
           background: rgba(129,140,248,0.12);
           border: 1px solid rgba(129,140,248,0.25);
           color: #818cf8;
         }
         .btn-purple:hover { background: rgba(129,140,248,0.18); }
-        .btn-purple:disabled {
-          opacity: 0.5; cursor: not-allowed; background: rgba(129,140,248,0.06);
-        }
-
+        .btn-purple:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(129,140,248,0.06); }
         .btn-red {
           background: rgba(248,113,113,0.12);
           border: 1px solid rgba(248,113,113,0.25);
           color: #f87171;
         }
         .btn-red:hover { background: rgba(248,113,113,0.18); }
-        .btn-red:disabled {
-          opacity: 0.5; cursor: not-allowed; background: rgba(248,113,113,0.06);
-        }
-
+        .btn-red:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(248,113,113,0.06); }
         .btn-amber {
           background: rgba(251,191,36,0.12);
           border: 1px solid rgba(251,191,36,0.25);
           color: #fbbf24;
         }
         .btn-amber:hover { background: rgba(251,191,36,0.18); }
-
         .btn-success {
           background: rgba(34,197,94,0.12);
           border: 1px solid rgba(34,197,94,0.25);
           color: #22c55e;
         }
         .btn-success:hover { background: rgba(34,197,94,0.18); }
+        @media (max-width: 768px) {
+          .ins-card { margin: 0 !important; }
+          .ins-header { text-align: center; padding-left: 0; padding-right: 0; }
+          .ins-wrapper { padding: 12px; }
+          .w-80 { width: 100% !important; border-left: none !important; }
+        }
       `}</style>
 
-      {/* Header */}
-      <div className="p-6 border-b border-[rgba(255,255,255,0.08)]">
+      <div className="p-6 border-b border-[rgba(255,255,255,0.08)] ins-header">
         <h2 className="heading-sans text-xl font-medium">Insights</h2>
         {activeDocument && (
           <p className="text-xs text-gray-400 mt-1 truncate">{activeDocument}</p>
@@ -187,9 +182,7 @@ export const InsightsPanel = ({
         </div>
       ) : (
         <>
-          {/* Action Cards */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* Quick Summary */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 dark-scrollbar ins-wrapper">
             <Card className="p-4 ins-card hover:shadow-[0_0_15px_rgba(52,211,153,0.2)]">
               <div className="flex items-center gap-3 mb-3">
                 <FileText className="h-5 w-5 accent-green" />
@@ -207,7 +200,7 @@ export const InsightsPanel = ({
                   <Button
                     onClick={() => {
                       if (!summaryUrl) return;
-                      const filename = `summary_${activeFileId || "document"}.txt`; // backend serves text/plain
+                      const filename = `summary_${activeFileId || "document"}.txt`;
                       downloadFile(summaryUrl, filename);
                     }}
                     className="w-full btn-success"
@@ -230,7 +223,6 @@ export const InsightsPanel = ({
               )}
             </Card>
 
-            {/* Audio Overview */}
             <Card className="p-4 ins-card hover:shadow-[0_0_15px_rgba(129,140,248,0.2)]">
               <div className="flex items-center gap-3 mb-3">
                 <Volume2 className="h-5 w-5 accent-purple" />
@@ -271,7 +263,6 @@ export const InsightsPanel = ({
               )}
             </Card>
 
-            {/* Risk Report */}
             <Card className="p-4 ins-card hover:shadow-[0_0_15px_rgba(248,113,113,0.2)]">
               <div className="flex items-center gap-3 mb-3">
                 <BarChart3 className="h-5 w-5 accent-red" />
@@ -312,7 +303,6 @@ export const InsightsPanel = ({
               )}
             </Card>
 
-            {/* Personal Notes */}
             <Card className="p-4 ins-card hover:shadow-[0_0_15px_rgba(251,191,36,0.2)]">
               <div className="flex items-center gap-3 mb-3">
                 <StickyNote className="h-5 w-5 accent-amber" />
@@ -334,7 +324,6 @@ export const InsightsPanel = ({
               )}
             </Card>
 
-            {/* Recent Activity */}
             <Card className="p-4 ins-card">
               <h3 className="font-semibold text-sm mb-3">Recent Activity</h3>
               <div className="space-y-2 text-xs">
@@ -384,7 +373,6 @@ export const InsightsPanel = ({
             </Card>
           </div>
 
-          {/* Footer */}
           <div className="p-4 border-t border-[rgba(255,255,255,0.08)]">
             <Button
               onClick={exportAllInsights}

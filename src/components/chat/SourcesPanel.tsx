@@ -42,7 +42,7 @@ export const SourcesPanel = ({
 }: SourcesPanelProps) => {
   return (
     <div
-      className="w-80 flex flex-col h-full text-gray-100 border-r"
+      className="flex flex-col h-full text-gray-100 border-r md:w-80 lg:w-96 w-full"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",
@@ -67,11 +67,14 @@ export const SourcesPanel = ({
           border-radius: 999px;
           border: 2px solid rgba(0,0,0,0.6);
         }
+        @media (max-width: 768px) {
+          .src-card { margin: 0 !important; }
+          .sources-header { text-align: center; }
+        }
       `}</style>
 
       {/* Header */}
-      <div className="p-6 border-b border-[rgba(255,255,255,0.08)] src-card m-2">
-        {/* Go Back Button */}
+      <div className="p-4 border-b border-[rgba(255,255,255,0.08)] src-card">
         <Button
           onClick={() => (window.location.href = "/")}
           variant="ghost"
@@ -87,7 +90,7 @@ export const SourcesPanel = ({
           Go Back
         </Button>
 
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 sources-header">
           <h2 className="heading-sans text-xl font-semibold">Sources</h2>
           <Badge
             variant="secondary"
@@ -179,7 +182,7 @@ export const SourcesPanel = ({
       </div>
 
       {/* Footer Info */}
-      <div className="p-4 border-t border-[rgba(255,255,255,0.08)] src-card m-2">
+      <div className="p-4 border-t border-[rgba(255,255,255,0.08)] src-card">
         <p className="text-xs text-gray-500 text-center">
           Supported: Contracts, Loan Agreements,
           <br />
