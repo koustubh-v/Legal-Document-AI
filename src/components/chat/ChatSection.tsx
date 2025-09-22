@@ -125,24 +125,13 @@ export const ChatSection = ({
   const titleDisplay = activeDocument ? activeDocument.replace(/\.pdf$/i, "") : "Document Analysis";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
-        background: "linear-gradient(180deg,#000,#050506)",
-      }}
-      className="mt-16 md:mt-0"
-    >
-
+    <div className="flex flex-col flex-1 min-h-0 bg-gradient-to-b from-black to-[#050506] mt-16 md:mt-0">
       <style>{`
         .header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background: linear-gradient(180deg,#061022,#091526); border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
         .header-left { display:flex; gap:12px; align-items:center; }
         .title { color:#f3f4f6; font-weight:600; font-size:18px; }
         .subtitle { color:#9ca3af; font-size:12px; margin-top:4px; }
         .robot-icon { width:56px; height:56px; border-radius:10px; display:grid; place-items:center; background:#0b1626; border:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
-        .chat-card { display:flex; flex-direction:column; flex:1; min-height:0; }
         .messages { padding:20px; overflow-y:auto; flex:1; min-height:0; -webkit-overflow-scrolling: touch; }
         .msg-row { display:flex; gap:14px; align-items:flex-start; margin-bottom:12px; }
         .msg-row.user { flex-direction:row-reverse; }
@@ -153,7 +142,7 @@ export const ChatSection = ({
         .dot:nth-child(2){ animation-delay:0.15s; }
         .dot:nth-child(3){ animation-delay:0.3s; }
         @keyframes blink { 0%,100%{opacity:0.3; transform:translateY(0);} 50%{opacity:1; transform:translateY(-4px);} }
-        .sticky-input { flex-shrink:0; display:flex; justify-content:center; padding:12px; background:#000; }
+        .sticky-input { flex-shrink:0; display:flex; justify-content:center; padding:12px; background:#000; border-top:1px solid rgba(255,255,255,0.06); }
         .form-wrap { width:100%; max-width:920px; display:flex; flex-direction:column; gap:6px; margin:0 auto; }
         .input-row { display:flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; background:#111; border:1px solid rgba(255,255,255,0.08); }
         .input-row input { flex:1; background:transparent; border:0; outline:none; color:#e6e6e6; font-size:13px; padding:6px 0; }
@@ -169,105 +158,113 @@ export const ChatSection = ({
         }
       `}</style>
 
+      {/* Header - Always fixed inside ChatSection */}
       <div className="header" role="banner">
         <div className="header-left">
           <div className="robot-icon">
             <BotIcon size={28} color="#e6e6e6" />
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div className="title" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{titleDisplay}</div>
+          <div className="min-w-0">
+            <div className="title truncate">{titleDisplay}</div>
             {activeDocument && <div className="subtitle">{activeDocument}</div>}
           </div>
         </div>
 
-        <div className="desktop-toggles" aria-hidden>
+        <div className="desktop-toggles">
           <div
             className="desktop-toggle-btn"
             onClick={() => setShowSourcesDesktop && setShowSourcesDesktop(!showSourcesDesktop)}
-            role="button"
-            tabIndex={0}
           >
             <Sidebar size={14} />
-            <span style={{ marginLeft: 6 }}>{showSourcesDesktop ? "Hide Sources" : "Show Sources"}</span>
+            <span>{showSourcesDesktop ? "Hide Sources" : "Show Sources"}</span>
           </div>
           <div
             className="desktop-toggle-btn"
             onClick={() => setShowInsightsDesktop && setShowInsightsDesktop(!showInsightsDesktop)}
-            role="button"
-            tabIndex={0}
           >
             <Activity size={14} />
-            <span style={{ marginLeft: 6 }}>{showInsightsDesktop ? "Hide Insights" : "Show Insights"}</span>
+            <span>{showInsightsDesktop ? "Hide Insights" : "Show Insights"}</span>
           </div>
         </div>
       </div>
 
-      <div className="chat-card">
-        <div className="messages" ref={containerRef} role="log" aria-live="polite">
-          {!hasDocuments && messages.length === 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-              <div style={{ width: "100%", maxWidth: 700, height: 300, borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                <Suspense fallback={<div style={{ height: "100%", display: "grid", placeItems: "center" }}>Loading 3D…</div>}>
-                  <Spline scene="https://prod.spline.design/n1Lad8xaG0iocaRW/scene.splinecode" />
-                </Suspense>
+      {/* Scrollable Messages */}
+      <div className="messages flex-1" ref={containerRef}>
+        {!hasDocuments && messages.length === 0 ? (
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-full max-w-[700px] h-[300px] rounded-lg border border-white/10 overflow-hidden">
+              <Suspense fallback={<div className="h-full grid place-items-center">Loading 3D…</div>}>
+                <Spline scene="https://prod.spline.design/n1Lad8xaG0iocaRW/scene.splinecode" />
+              </Suspense>
+            </div>
+            <h2 className="text-gray-200">Ask Anything</h2>
+            <p className="text-gray-400 text-center max-w-[520px]">
+              Upload your legal documents to begin AI-powered analysis and get instant insights.
+            </p>
+          </div>
+        ) : (
+          <>
+            {messages.map((m) => (
+              <div key={m.id} className={`msg-row ${m.sender === "user" ? "user" : ""}`}>
+                <div className="avatar">
+                  {m.sender === "ai" ? <BotIcon size={16} color="#9edbff" /> : <User size={16} color="#7efbb5" />}
+                </div>
+                <div className="bubble">
+                  <div className="flex justify-between mb-1">
+                    <Badge variant="outline" className="text-[11px] text-gray-300 border-white/10">
+                      {m.sender === "ai" ? "AI Assistant" : "You"}
+                    </Badge>
+                    <span className="text-[11px] text-gray-500">
+                      {m.timestamp instanceof Date ? m.timestamp.toLocaleTimeString() : new Date(m.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  {m.text}
+                </div>
               </div>
-              <h2 style={{ color: "#e6e6e6" }}>Ask Anything</h2>
-              <p style={{ color: "#9ca3af", textAlign: "center", maxWidth: 520 }}>Upload your legal documents to begin AI-powered analysis and get instant insights.</p>
-            </div>
-          ) : (
-            <>
-              {messages.map((m) => (
-                <div key={m.id} className={`msg-row ${m.sender === "user" ? "user" : ""}`}>
-                  <div className="avatar">
-                    {m.sender === "ai" ? <BotIcon size={16} color="#9edbff" /> : <User size={16} color="#7efbb5" />}
-                  </div>
-                  <div className="bubble">
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <Badge variant="outline" style={{ fontSize: 11, color: "#ccc", borderColor: "rgba(255,255,255,0.08)" }}>
-                        {m.sender === "ai" ? "AI Assistant" : "You"}
-                      </Badge>
-                      <span style={{ fontSize: 11, color: "#777" }}>{m.timestamp instanceof Date ? m.timestamp.toLocaleTimeString() : new Date(m.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    {m.text}
+            ))}
+            {isLoading && (
+              <div className="msg-row">
+                <div className="avatar">
+                  <BotIcon size={16} color="#9edbff" />
+                </div>
+                <div className="bubble">
+                  <div className="typing-dots">
+                    <div className="dot" />
+                    <div className="dot" />
+                    <div className="dot" />
                   </div>
                 </div>
-              ))}
-              {isLoading && (
-                <div className="msg-row">
-                  <div className="avatar"><BotIcon size={16} color="#9edbff" /></div>
-                  <div className="bubble"><div className="typing-dots"><div className="dot" /><div className="dot" /><div className="dot" /></div></div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
 
-        <div className="sticky-input" role="region" aria-label="Chat input">
-          <div className="form-wrap">
-            <form onSubmit={handleSubmit} className="input-row" role="form">
-              <input
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask about your documents..."
-                disabled={isLoading}
-                aria-label="Message"
-              />
-              <button type="button" aria-label="Voice">
-                <Mic size={14} color="#e6e6e6" />
-              </button>
-              <button type="submit" disabled={!inputText.trim() || isLoading} aria-label="Send">
-                <Send size={14} color="#fff" />
-              </button>
-            </form>
+      {/* Sticky Input - Always visible */}
+      <div className="sticky-input">
+        <div className="form-wrap">
+          <form onSubmit={handleSubmit} className="input-row">
+            <input
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Ask about your documents..."
+              disabled={isLoading}
+            />
+            <button type="button">
+              <Mic size={14} color="#e6e6e6" />
+            </button>
+            <button type="submit" disabled={!inputText.trim() || isLoading}>
+              <Send size={14} color="#fff" />
+            </button>
+          </form>
 
-            <div className="suggest-row" aria-hidden={false}>
-              {suggestedQuestions.map((q, i) => (
-                <div key={i} className="suggest-pill" onClick={() => handleSuggested(q)} role="button" tabIndex={0}>
-                  {q}
-                </div>
-              ))}
-            </div>
+          <div className="suggest-row">
+            {suggestedQuestions.map((q, i) => (
+              <div key={i} className="suggest-pill" onClick={() => handleSuggested(q)}>
+                {q}
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -72,7 +72,7 @@ export const UploadModal = ({
         e.dataTransfer.clearData();
       }
     },
-    [selectedFiles, currentFileCount]
+    [selectedFiles, currentFileCount] // Added dependencies
   );
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,10 +112,10 @@ export const UploadModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
+        // Simplified styles: h-[90vh] and my-auto center the 90vh modal in the 100vh viewport.
         className="w-[95vw] max-w-2xl md:max-w-3xl h-[90vh] flex flex-col mx-auto my-auto p-0 gap-0"
-        style={{ marginTop: "5vh", marginBottom: "5vh" }}
       >
-        {/* Header */}
+        {/* Header (Sticky) */}
         <div className="flex-shrink-0 p-6 pb-4 border-b border-border/50">
           <DialogHeader>
             <DialogTitle className="heading-sans text-xl md:text-2xl font-light">
@@ -130,8 +130,9 @@ export const UploadModal = ({
           </DialogHeader>
         </div>
 
-        {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-6 space-y-6 max-w-2xl mx-auto w-full">
+        {/* Scrollable Body (Single Scrollbar) */}
+        {/* MODIFIED: Removed max-w-2xl mx-auto w-full to let it fill the modal width */}
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-6 space-y-6">
           {/* Upload Area */}
           <Card
             className={`border-2 border-dashed p-6 md:p-12 text-center cursor-pointer rounded-2xl transition ${
@@ -162,7 +163,8 @@ export const UploadModal = ({
           {selectedFiles.length > 0 && (
             <div>
               <h4 className="font-medium text-sm mb-3">Selected Files ({selectedFiles.length})</h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+              {/* MODIFIED: Removed max-h-48 and overflow-y-auto */}
+              <div className="space-y-2 pr-2">
                 {selectedFiles.map((file, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 bg-card rounded-lg">
                     <FileText className="h-5 w-5 text-primary" />
@@ -185,7 +187,8 @@ export const UploadModal = ({
           {errors.length > 0 && (
             <div>
               <h4 className="font-medium text-sm text-destructive mb-2">Upload Errors</h4>
-              <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
+              {/* MODIFIED: Removed max-h-32 and overflow-y-auto */}
+              <div className="space-y-2 pr-2">
                 {errors.map((err, i) => (
                   <div key={i} className="flex items-center gap-2 p-2 bg-destructive/10 rounded-lg text-xs text-destructive">
                     <AlertCircle className="h-4 w-4" /> {err}
@@ -196,7 +199,7 @@ export const UploadModal = ({
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer (Sticky) */}
         <div className="flex-shrink-0 p-6 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-end gap-3">
             <Button variant="outline" onClick={onClose} disabled={isUploading}>
