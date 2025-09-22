@@ -76,9 +76,7 @@ export const ChatSection = ({
     setTimeout(() => setVisible((prev) => [...prev, last.id]), 80);
   }, [messages]);
   useEffect(() => {
-    if (conversationId && onConversationIdChange) {
-      onConversationIdChange(conversationId);
-    }
+    if (conversationId && onConversationIdChange) onConversationIdChange(conversationId);
   }, [conversationId, onConversationIdChange]);
   const internalSendMessage = async (text: string) => {
     if (!text.trim()) return;
@@ -239,9 +237,9 @@ export const ChatSection = ({
               </button>
             </form>
 
-            <div className="suggest-row" aria-hidden={false}>
+            <div className="suggest-row" role="list" aria-label="Suggested questions">
               {suggestedQuestions.map((q, i) => (
-                <div key={i} className="suggest-pill" onClick={() => handleSuggested(q)}>{q}</div>
+                <div key={i} className="suggest-pill" onClick={() => handleSuggested(q)} role="listitem">{q}</div>
               ))}
             </div>
           </div>
