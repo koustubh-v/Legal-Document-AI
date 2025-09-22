@@ -41,10 +41,10 @@ export const SourcesPanel = ({
   onAddMore,
 }: SourcesPanelProps) => {
   return (
-    // MODIFICATION: Removed 'mt-16 md:mt-0'
-    // The parent 'main' element in ChatPage already handles the top offset.
+    // MODIFICATION: Replaced 'flex-1' with 'h-full'
+    // This forces the panel to take the height of its 'h-full' parent in ChatPage.
     <div
-      className="flex flex-col flex-1 min-h-0 text-gray-100 border-r md:w-80 lg:w-96 w-full"
+      className="flex flex-col h-full min-h-0 text-gray-100 border-r md:w-80 lg:w-96 w-full"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",
@@ -77,7 +77,7 @@ export const SourcesPanel = ({
         }
       `}</style>
 
-      {/* Fixed Header - 'flex-shrink: 0' from CSS */}
+      {/* Fixed Header */}
       <div className="p-4 border-b border-[rgba(255,255,255,0.08)] src-card sources-header">
         <Button
           onClick={() => (window.location.href = "/")}
@@ -124,7 +124,7 @@ export const SourcesPanel = ({
         </Button>
       </div>
 
-      {/* Scrollable File List - 'flex-1 overflow-y-auto' */}
+      {/* Scrollable File List */}
       <div className="flex-1 overflow-y-auto dark-scrollbar px-2 pb-2">
         {uploadedFiles.length === 0 ? (
           <div className="p-6 text-center text-gray-400 src-card">
@@ -185,7 +185,7 @@ export const SourcesPanel = ({
         )}
       </div>
 
-      {/* Fixed Footer - 'flex-shrink: 0' from CSS */}
+      {/* Fixed Footer */}
       <div className="p-4 border-t border-[rgba(255,255,255,0.08)] src-card sources-footer">
         <p className="text-xs text-gray-500 text-center">
           Supported: Contracts, Loan Agreements,
