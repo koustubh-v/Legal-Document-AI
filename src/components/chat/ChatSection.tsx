@@ -125,7 +125,10 @@ export const ChatSection = ({
   const titleDisplay = activeDocument ? activeDocument.replace(/\.pdf$/i, "") : "Document Analysis";
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-gradient-to-b from-black to-[#050506] mt-16 md:mt-0">
+    // MODIFICATION: Removed 'mt-16 md:mt-0'
+    // The parent 'main' element in ChatPage already handles the top offset
+    // for the fixed mobile header.
+    <div className="flex flex-col flex-1 min-h-0 bg-gradient-to-b from-black to-[#050506]">
       <style>{`
         .header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background: linear-gradient(180deg,#061022,#091526); border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
         .header-left { display:flex; gap:12px; align-items:center; }
@@ -158,7 +161,7 @@ export const ChatSection = ({
         }
       `}</style>
 
-      {/* Header - Always fixed inside ChatSection */}
+      {/* Header - This is 'flex-shrink: 0' from the CSS */}
       <div className="header" role="banner">
         <div className="header-left">
           <div className="robot-icon">
@@ -188,7 +191,7 @@ export const ChatSection = ({
         </div>
       </div>
 
-      {/* Scrollable Messages */}
+      {/* Scrollable Messages - This is 'flex: 1' and 'overflow-y: auto' from the CSS */}
       <div className="messages flex-1" ref={containerRef}>
         {!hasDocuments && messages.length === 0 ? (
           <div className="flex flex-col items-center gap-4">
@@ -241,7 +244,7 @@ export const ChatSection = ({
         )}
       </div>
 
-      {/* Sticky Input - Always visible */}
+      {/* Sticky Input - This is 'flex-shrink: 0' from the CSS */}
       <div className="sticky-input">
         <div className="form-wrap">
           <form onSubmit={handleSubmit} className="input-row">

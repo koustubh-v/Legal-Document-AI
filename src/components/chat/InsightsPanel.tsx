@@ -99,8 +99,10 @@ export const InsightsPanel = ({
   };
 
   return (
+    // MODIFICATION: Removed 'mt-16 md:mt-0'
+    // The parent 'main' element in ChatPage already handles the top offset.
     <div
-      className="flex flex-col flex-1 min-h-0 text-gray-100 border-l md:w-80 lg:w-80 w-full mt-16 md:mt-0"
+      className="flex flex-col flex-1 min-h-0 text-gray-100 border-l md:w-80 lg:w-80 w-full"
       style={{
         background: "linear-gradient(180deg,#000,#050505)",
         borderColor: "rgba(255,255,255,0.08)",
@@ -165,7 +167,7 @@ export const InsightsPanel = ({
         }
       `}</style>
 
-      {/* Fixed Header */}
+      {/* Fixed Header - 'flex-shrink: 0' from CSS */}
       <div className="p-6 border-b border-[rgba(255,255,255,0.08)] ins-header">
         <h2 className="heading-sans text-xl font-medium">Insights</h2>
         {activeDocument && (
@@ -182,6 +184,7 @@ export const InsightsPanel = ({
           </div>
         </div>
       ) : (
+        // This 'flex-1 overflow-y-auto' is the key scrolling container
         <div className="flex-1 overflow-y-auto p-4 space-y-4 dark-scrollbar ins-wrapper">
           <Card className="p-4 ins-card hover:shadow-[0_0_15px_rgba(52,211,153,0.2)]">
             <div className="flex items-center gap-3 mb-3">
@@ -371,7 +374,7 @@ export const InsightsPanel = ({
         </div>
       )}
 
-      {/* Fixed Footer */}
+      {/* Fixed Footer - 'flex-shrink: 0' from CSS */}
       <div className="p-4 border-t border-[rgba(255,255,255,0.08)] ins-footer">
         <Button
           onClick={exportAllInsights}

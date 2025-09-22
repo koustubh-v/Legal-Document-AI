@@ -125,6 +125,7 @@ const ChatPage = () => {
         `}
       </style>
 
+      {/* This mobile header is fixed, so it's out of the layout flow. */}
       <header className="fixed top-0 left-0 w-full z-30 bg-background py-4 px-6 flex justify-between items-center md:hidden border-b border-gray-800">
         <a href="/" className="text-xl font-bold text-foreground z-30">Legal AI</a>
         <button onClick={() => setIsMobileMenuOpen((prev) => !prev)} className="z-30">
@@ -150,7 +151,12 @@ const ChatPage = () => {
         </div>
       )}
 
-      <main className="flex-1 flex flex-row" style={{ overflow: "hidden" }}>
+      {/* MODIFICATION: 
+        Added 'pt-16 md:pt-0'
+        'pt-16' (4rem) offsets the content to account for the fixed mobile header.
+        'md:pt-0' removes this padding on desktop, where the fixed header is hidden.
+      */}
+      <main className="flex-1 flex flex-row pt-16 md:pt-0" style={{ overflow: "hidden" }}>
         <div
           className={`${mobileView === "sources" ? "block w-full h-full" : "hidden"} md:block md:h-full`}
           style={{
@@ -209,6 +215,9 @@ const ChatPage = () => {
         </div>
       </main>
 
+      {/* This mobile footer is part of the flex-col, so it correctly
+        sits at the bottom of the h-screen view. No changes needed.
+      */}
       <div className="md:hidden flex justify-around p-2 border-t bg-background shadow-sm mobile-only" style={{ position: "relative", zIndex: 10 }}>
         <button
           onClick={() => {
