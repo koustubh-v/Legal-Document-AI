@@ -3,7 +3,7 @@ import { SourcesPanel } from "@/components/chat/SourcesPanel";
 import { ChatSection } from "@/components/chat/ChatSection";
 import { InsightsPanel } from "@/components/chat/InsightsPanel";
 import { UploadModal } from "@/components/chat/UploadModal";
-import { useFiles, useUploadFile, useChat } from "@/hooks/api";
+import { useFiles, useUploadFile } from "@/hooks/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface UploadedFile {
@@ -12,14 +12,6 @@ interface UploadedFile {
   size: number;
   type: string;
   uploadedAt: Date;
-}
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "ai";
-  timestamp: Date;
-  conversation_id?: string;
 }
 
 const ChatPage = () => {
@@ -33,13 +25,9 @@ const ChatPage = () => {
   const [showSourcesDesktop, setShowSourcesDesktop] = useState(true);
   const [showInsightsDesktop, setShowInsightsDesktop] = useState(true);
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState("");
-
   const { toast } = useToast();
   const { data: filesData, isLoading, error, refetch } = useFiles();
   const uploadMutation = useUploadFile();
-  const chatMutation = useChat();
 
   const uploadedFiles: UploadedFile[] =
     filesData?.files?.map((file) => ({
@@ -103,43 +91,8 @@ const ChatPage = () => {
     }
   };
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: text.trim(),
-      sender: "user",
-      timestamp: new Date(),
-      conversation_id: conversationId || undefined,
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInputText("");
-    try {
-      const response = await chatMutation.mutateAsync({
-        message: text.trim(),
-        file_id: activeFileId || undefined,
-        conversation_id: conversationId || undefined,
-      });
-      if (!conversationId && response.conversation_id) {
-        setConversationId(response.conversation_id);
-      }
-      const aiMessage: Message = {
-        id: response.message_id || (Date.now() + 1).toString(),
-        text: response.response || "I received your message.",
-        sender: "ai",
-        timestamp: new Date(),
-        conversation_id: response.conversation_id,
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (error: any) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: `Sorry, I encountered an error: ${error?.message || "Please try again."}`,
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    }
+  const handleConversationIdChange = (newConversationId: string) => {
+    setConversationId(newConversationId);
   };
 
   if (isLoading) {
@@ -154,7 +107,10 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="font-poppins bg-background flex flex-col" style={{ height: "100vh", overflow: "hidden" }}>
+    <div
+      className="font-poppins bg-background flex flex-col"
+      style={{ height: "100vh", overflow: "hidden" }}
+    >
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
@@ -162,31 +118,47 @@ const ChatPage = () => {
         `}
       </style>
 
-      <header className="fixed top-0 left-0 w-full z-30 bg-transparent hidden md:flex items-center justify-between px-6" style={{ height: 64 }}>
-        <a href="/" className="text-xl font-bold text-foreground">Legal AI</a>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowSourcesDesktop((s) => !s)} className="px-3 py-1 rounded-md text-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)]">
-            {showSourcesDesktop ? "Hide Sources" : "Show Sources"}
-          </button>
-          <button onClick={() => setShowInsightsDesktop((s) => !s)} className="px-3 py-1 rounded-md text-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)]">
-            {showInsightsDesktop ? "Hide Insights" : "Show Insights"}
-          </button>
-        </div>
-      </header>
-
-      <header className="fixed top-0 left-0 w-full z-30 flex md:hidden items-center justify-between px-4" style={{ height: 56 }}>
-        <a href="/" className="text-lg font-semibold text-foreground">Legal AI</a>
-        <button onClick={() => setIsMobileMenuOpen((prev) => !prev)} className="z-30">
+      {/* Mobile Nav */}
+      <header className="fixed top-0 left-0 w-full z-20 bg-background py-4 px-6 flex justify-between items-center md:hidden border-b border-gray-800">
+        <a href="/" className="text-xl font-bold text-foreground z-30">Legal AI</a>
+        <button
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          className="z-30"
+        >
           {isMobileMenuOpen ? (
-            <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <svg
+              className="w-6 h-6 text-foreground"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
           ) : (
-            <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+            <svg
+              className="w-6 h-6 text-foreground"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
           )}
         </button>
       </header>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-14 z-20 bg-background p-6 pt-8">
+        <div className="md:hidden fixed inset-0 top-16 z-10 bg-background p-6 pt-8">
           <nav className="flex flex-col items-start space-y-4">
             <a href="#" className="text-lg text-muted-foreground hover:text-foreground transition-colors">Overview</a>
             <a href="#" className="text-lg text-muted-foreground hover:text-foreground transition-colors">Features</a>
@@ -195,94 +167,111 @@ const ChatPage = () => {
         </div>
       )}
 
-      <main className="flex-1 flex" style={{ paddingTop: 64, overflow: "hidden" }}>
-        <div className="w-full flex" style={{ height: "calc(100vh - 64px)", overflow: "hidden" }}>
-          <div
-            className={`${mobileView === "sources" ? "block w-full h-full" : "hidden"} md:block md:h-full`}
-            style={{
-              width: showSourcesDesktop ? undefined : 0,
-              transition: "width 200ms ease",
-              overflow: "hidden",
-            }}
-          >
-            {showSourcesDesktop && (
-              <div className="md:w-80 lg:w-96 h-full" style={{ height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-                <SourcesPanel
-                  uploadedFiles={uploadedFiles}
-                  selectedFiles={selectedFiles}
-                  onFileSelect={handleFileSelect}
-                  onFileClick={handleFileClick}
-                  onAddMore={() => setShowUploadModal(true)}
-                />
-              </div>
-            )}
-          </div>
-
-          <div className={`${mobileView === "chat" ? "flex" : "hidden"} flex-1 flex-col`} style={{ minHeight: 0, overflow: "hidden", transition: "width 200ms ease" }}>
-            <div style={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-              <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-                <ChatSection
-                  activeDocument={activeDocument}
-                  hasDocuments={uploadedFiles.length > 0}
-                  activeFileId={activeFileId}
-                  onConversationIdChange={(id) => setConversationId(id)}
-                  messages={messages}
-                  inputText={inputText}
-                  setInputText={setInputText}
-                  sendMessage={sendMessage}
-                  isLoading={chatMutation.isPending}
-                  showSourcesDesktop={showSourcesDesktop}
-                  setShowSourcesDesktop={setShowSourcesDesktop}
-                  showInsightsDesktop={showInsightsDesktop}
-                  setShowInsightsDesktop={setShowInsightsDesktop}
-                />
-              </div>
+      {/* Main Content */}
+      <main
+        className="flex-1 flex flex-row pt-16 md:pt-0"
+        style={{ overflow: "hidden" }}
+      >
+        {/* Sources */}
+        <div
+          className={`${mobileView === "sources" ? "block w-full h-full" : "hidden"} md:block md:h-full`}
+          style={{
+            overflow: "hidden",
+            width: showSourcesDesktop ? undefined : 0,
+            transition: "width 200ms ease",
+          }}
+        >
+          {showSourcesDesktop && (
+            <div className="md:w-80 lg:w-96 h-full">
+              <SourcesPanel
+                uploadedFiles={uploadedFiles}
+                selectedFiles={selectedFiles}
+                onFileSelect={handleFileSelect}
+                onFileClick={handleFileClick}
+                onAddMore={() => setShowUploadModal(true)}
+              />
             </div>
-          </div>
+          )}
+        </div>
 
-          <div
-            className={`${mobileView === "insights" ? "block w-full h-full" : "hidden"} md:hidden lg:block lg:h-full`}
-            style={{
-              width: showInsightsDesktop ? undefined : 0,
-              transition: "width 200ms ease",
-              overflow: "hidden",
-            }}
-          >
-            {showInsightsDesktop && (
-              <div className="lg:w-80 h-full" style={{ height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-                <InsightsPanel
-                  activeDocument={activeDocument}
-                  hasDocuments={uploadedFiles.length > 0}
-                  activeFileId={activeFileId}
-                  conversationId={conversationId}
-                />
-              </div>
-            )}
-          </div>
+        {/* Chat */}
+        <div
+          className={`${mobileView === "chat" ? "flex" : "hidden"} flex-1 flex-col`}
+          style={{
+            minHeight: 0,
+            overflow: "hidden",
+            transition: "width 200ms ease",
+          }}
+        >
+          <ChatSection
+            activeDocument={activeDocument}
+            hasDocuments={uploadedFiles.length > 0}
+            activeFileId={activeFileId}
+            onConversationIdChange={handleConversationIdChange}
+            showSourcesDesktop={showSourcesDesktop}
+            setShowSourcesDesktop={setShowSourcesDesktop}
+            showInsightsDesktop={showInsightsDesktop}
+            setShowInsightsDesktop={setShowInsightsDesktop}
+          />
+        </div>
+
+        {/* Insights */}
+        <div
+          className={`${mobileView === "insights" ? "block w-full h-full" : "hidden"} md:hidden lg:block lg:h-full`}
+          style={{
+            overflow: "hidden",
+            width: showInsightsDesktop ? undefined : 0,
+            transition: "width 200ms ease",
+          }}
+        >
+          {showInsightsDesktop && (
+            <div className="lg:w-80 h-full">
+              <InsightsPanel
+                activeDocument={activeDocument}
+                hasDocuments={uploadedFiles.length > 0}
+                activeFileId={activeFileId}
+                conversationId={conversationId}
+              />
+            </div>
+          )}
         </div>
       </main>
 
-      <div className="md:hidden fixed left-0 right-0 bottom-0 flex justify-around p-2 border-t bg-background shadow-sm" style={{ height: 56 }}>
+      {/* Mobile Tabs */}
+      <div className="md:hidden flex justify-around p-2 border-t bg-background shadow-sm">
         <button
           onClick={() => setMobileView("sources")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "sources" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${
+            mobileView === "sources"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground"
+          }`}
         >
           Sources
         </button>
         <button
           onClick={() => setMobileView("chat")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "chat" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${
+            mobileView === "chat"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground"
+          }`}
         >
           Chat
         </button>
         <button
           onClick={() => setMobileView("insights")}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${mobileView === "insights" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          className={`px-3 py-1 rounded-md text-sm font-medium ${
+            mobileView === "insights"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground"
+          }`}
         >
           Insights
         </button>
       </div>
 
+      {/* Upload Modal */}
       <UploadModal
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
